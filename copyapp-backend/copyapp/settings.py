@@ -37,7 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django'
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'rest_framework.authtoken',
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -48,9 +55,34 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+   
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+AUTHENTICATION_CLASSES = (
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'dj_rest_auth.authentication.AllAuthJWTAuthentication',
+    'rest_framework.authentication.SessionAuthentication',
+)
+
+
+SITE_ID = 1
+
+# Configure social accounts
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '690214190021-ref78qurpiceqn4ncjkj3uboi98e5po1.apps.googleusercontent.com',
+            'secret': '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',
+            'key': '',
+        }
+    }
+}
+
 
 ROOT_URLCONF = 'copyapp.urls'
 
@@ -84,8 +116,8 @@ DATABASES = {
 }
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-google-client-id'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-google-client-secret'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '690214190021-ref78qurpiceqn4ncjkj3uboi98e5po1.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = '/'
