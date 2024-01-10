@@ -4,9 +4,13 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+
 import requests
 
-
+@api_view(['POST'])
 def google_authenticate(request):
     # Redirect the user to Google's OAuth2 consent screen
     redirect_url = 'https://accounts.google.com/o/oauth2/auth?' \
@@ -14,7 +18,8 @@ def google_authenticate(request):
                    'redirect_uri=http://localhost:8000/auth/google/callback/&' \
                    'response_type=code&' \
                    'scope=email%20profile'
-    return redirect(redirect_url)
+    return Response({'redirect':redirect_url})
+
 
 def google_callback(request):
     # Retrieve the authorization code from the query parameters
@@ -44,8 +49,17 @@ def google_callback(request):
 
     # Handle user registration and login logic based on user_info
     # ...
-    if User.objects.filter(email = user_info['email']).count:
+    try:
+        user = User.objects.get(email = user_info['email'])
+        
         print("User Already Presented")
-    else:
-        User.objects.create(email=user_info['email'])
-    return JsonResponse({'message': 'Successfully authenticated with Google'})
+        try:
+            token = Token.objects.get(user=user)
+        except Exception as e:
+            token = Token.objects.create(user=user)
+      
+            
+    except Exception as e:
+        user = User.objects.create(email=user_info['email'])
+        token = Token.objects.create(user=user)
+    return JsonResponse({'message': 'Successfully authenticated with Google', 'token': str(token.key)})
